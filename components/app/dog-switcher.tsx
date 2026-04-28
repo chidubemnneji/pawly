@@ -50,12 +50,20 @@ export function DogSwitcher({ dogs }: { dogs: DogLite[] }) {
           </select>
         )}
       </div>
-      <Link
-        href="/onboarding"
-        className="mt-2 flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-ink-soft hover:bg-ink/5"
-      >
-        <PlusIcon size={16} /> Add another dog
-      </Link>
+      <div className="flex gap-1 mt-1">
+        <Link
+          href="/dogs"
+          className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-[13px] text-ink-soft hover:bg-ink/5"
+        >
+          All dogs
+        </Link>
+        <Link
+          href="/onboarding"
+          className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-[13px] text-ink-soft hover:bg-ink/5"
+        >
+          <PlusIcon size={14} /> Add
+        </Link>
+      </div>
     </div>
   );
 }

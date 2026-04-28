@@ -25,6 +25,11 @@ const onboardingSchema = z.object({
   social: z.number().int().min(1).max(5).default(3),
   /** Map of healthRecord name → ISO date string for "last given". Empty/missing → unknown. */
   healthDates: z.record(z.string(), z.string()).default({}),
+  vetName: z.string().optional().nullable(),
+  vetClinic: z.string().optional().nullable(),
+  vetPhone: z.string().optional().nullable(),
+  livesWithDogs: z.number().int().min(0).default(0),
+  livesWithKids: z.boolean().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -53,6 +58,11 @@ export async function POST(req: NextRequest) {
         energy: data.energy,
         confidence: data.confidence,
         social: data.social,
+        vetName: data.vetName ?? null,
+        vetClinic: data.vetClinic ?? null,
+        vetPhone: data.vetPhone ?? null,
+        livesWithDogs: data.livesWithDogs,
+        livesWithKids: data.livesWithKids,
       },
     });
 

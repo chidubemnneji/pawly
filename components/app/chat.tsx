@@ -186,9 +186,10 @@ export function ChatView({
 
 function Bubble({ msg }: { msg: Msg }) {
   const isUser = msg.role === 'USER';
+  const isAssistant = msg.role === 'ASSISTANT';
   const isUrgent = msg.severity === 'URGENT';
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
       <div
         className={`relative max-w-[85%] px-4 py-3 rounded-2xl whitespace-pre-wrap leading-relaxed ${
           isUser
@@ -199,10 +200,15 @@ function Bubble({ msg }: { msg: Msg }) {
         }`}
       >
         {isUrgent && (
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-danger mb-1.5">Urgent</p>
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-danger mb-1.5">Urgent — call your vet</p>
         )}
         <p className="text-[15px]">{msg.content}</p>
       </div>
+      {isAssistant && !isUrgent && (
+        <p className="text-[11px] text-ink-faint mt-1 ml-2 max-w-[85%]">
+          General guidance — not vet advice. Always check with your vet for medical concerns.
+        </p>
+      )}
     </div>
   );
 }

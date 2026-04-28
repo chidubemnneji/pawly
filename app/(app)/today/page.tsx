@@ -5,6 +5,10 @@ import { findBreed } from '@/lib/breeds';
 import { buildTasksForDog } from '@/lib/tasks';
 import { TaskCard } from '@/components/app/task-card';
 import { Card, CardBody } from '@/components/ui/card';
+import { StreakCard } from '@/components/app/streak-card';
+import { SetupChecklist } from '@/components/app/setup-checklist';
+import { PushPrompt } from '@/components/app/push-prompt';
+import { startOfWeek, endOfWeek, computeWeekStats, computeStreak } from '@/lib/care-stats';
 
 export default async function TodayPage({
   searchParams,
@@ -63,6 +67,35 @@ export default async function TodayPage({
   const done = tasks.filter((t) => t.status === 'DONE');
   const urgentCount = open.filter((t) => t.urgent).length;
 
+  // Weekly care stats
+  const weekStart = startOfWeek(today);
+  const weekEnd = endOfWeek(today);
+  const weekTasks = await prisma.task.findMany({
+    where: {
+      dogId: dog.id,
+      scheduledFor: { gte: weekStart, lt: weekEnd },
+    },
+  });
+  const weekStats = computeWeekStats(weekTasks, today);
+
+  // Streak: look back at the prior 8 weeks
+  const streakStart = new Date(weekStart);
+  streakStart.setDate(streakStart.getDate() - 8 * 7);
+  const recent = await prisma.task.findMany({
+    where: {
+      dogId: dog.id,
+      scheduledFor: { gte: streakStart, lt: weekStart },
+    },
+    orderBy: { scheduledFor: 'desc' },
+  });
+  const byWeek: Record<string, typeof recent> = {};
+  for (const t of recent) {
+    const ws = startOfWeek(t.scheduledFor).toISOString().slice(0, 10);
+    (byWeek[ws] ||= []).push(t);
+  }
+  const weekArrays = Object.keys(byWeek).sort().reverse().map((k) => byWeek[k]);
+  const streak = computeStreak(weekArrays);
+
   const greeting = (() => {
     const h = today.getHours();
     if (h < 12) return 'Good morning';
@@ -95,6 +128,21 @@ export default async function TodayPage({
           </CardBody>
         </Card>
       )}
+
+      <div className="grid sm:grid-cols-2 gap-3 mb-6">
+        <StreakCard
+          pct={weekStats.pct}
+          completed={weekStats.completed}
+          total={weekStats.total}
+          streak={streak}
+          dogName={dog.name}
+        />
+        <SetupChecklist dog={dog} />
+      </div>
+
+      <div className="mb-6">
+        <PushPrompt vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ''} />
+      </div>
 
       <section>
         <h2 className="font-display text-xl font-semibold tracking-tight mb-3">Today&rsquo;s plan</h2>

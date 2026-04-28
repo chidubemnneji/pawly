@@ -1,5 +1,6 @@
 import type { Dog, HealthRecord } from '@prisma/client';
 import { addDays, daysUntil, lifeStage, suggestedPortion } from './utils';
+import { findBreed } from './breeds';
 
 export type GeneratedTask = {
   type: 'FEEDING' | 'EXERCISE' | 'HEALTH' | 'WELLNESS' | 'TRAINING' | 'MEDICATION';
@@ -25,14 +26,24 @@ export function buildTasksForDog(
 ): GeneratedTask[] {
   const tasks: GeneratedTask[] = [];
   const dayKey = forDate.toISOString().slice(0, 10);
+  const breed = findBreed(dog.breed);
+  const stage = lifeStage(dog.dob);
 
-  // Feeding
+  // Feeding — rationale: portion size derived from weight + life stage
   const feedingTimes = dog.feedingTimes.length ? dog.feedingTimes : ['08:00', '18:00'];
+  const portion = suggestedPortion(dog.weight, dog.dob);
   feedingTimes.forEach((time, i) => {
+    const stageNote = stage === 'puppy'
+      ? `${dog.name} is a puppy — higher kcal/kg`
+      : stage === 'senior'
+        ? `${dog.name} is a senior — lower kcal/kg`
+        : `tailored to ${dog.name}'s weight`;
     tasks.push({
       type: 'FEEDING',
       title: i === 0 ? 'Breakfast' : i === 1 ? 'Dinner' : `Meal ${i + 1}`,
-      subtitle: `${suggestedPortion(dog.weight, dog.dob)}g · ${dog.food ?? 'current food'}`,
+      subtitle: dog.weight
+        ? `~${portion}g of ${dog.food ?? 'food'} · ${stageNote}`
+        : `${dog.food ?? 'Current food'} · check pack guide`,
       iconKey: 'bowl',
       scheduledFor: forDate,
       timeOfDay: time,
@@ -41,14 +52,19 @@ export function buildTasksForDog(
     });
   });
 
-  // Walk
+  // Walk — rationale: target from owner-set minutes + breed exercise need
+  const walkTarget = Math.min(dog.exerciseMins, 90);
+  const walkStyleLabel =
+    dog.walkStyle === 'OFF_LEAD' ? 'off-lead OK'
+    : dog.walkStyle === 'ON_LEAD' ? 'on-lead'
+    : 'mixed';
+  const breedHint = breed
+    ? `${breed.name}s typically need ${breed.exercise.toLowerCase()}`
+    : `${walkStyleLabel} walk`;
   tasks.push({
     type: 'EXERCISE',
-    title: `${Math.min(dog.exerciseMins, 90)}-min walk`,
-    subtitle:
-      dog.walkStyle === 'OFF_LEAD' ? 'Off-lead OK'
-      : dog.walkStyle === 'ON_LEAD' ? 'On-lead'
-      : 'Mixed walk',
+    title: `${walkTarget}-min walk`,
+    subtitle: `${walkStyleLabel} · ${breedHint}`,
     iconKey: 'walk',
     scheduledFor: forDate,
     timeOfDay: '12:30',
@@ -68,7 +84,9 @@ export function buildTasksForDog(
       title: isOverdue
         ? `${r.name} — overdue`
         : `${r.name} — due ${days === 0 ? 'today' : `in ${days}d`}`,
-      subtitle: isOverdue ? 'Book vet appointment' : `Next due ${r.nextDue.toLocaleDateString('en-GB')}`,
+      subtitle: isOverdue
+        ? `Was due ${r.nextDue.toLocaleDateString('en-GB')} — book vet to keep ${dog.name} protected`
+        : `Next due ${r.nextDue.toLocaleDateString('en-GB')} · ${r.frequency ?? 'recurring'}`,
       iconKey: r.type === 'MEDICATION' ? 'pill' : 'shield',
       scheduledFor: forDate,
       timeOfDay: null,
@@ -79,10 +97,11 @@ export function buildTasksForDog(
 
   // Wellness check (Tuesdays)
   if (forDate.getDay() === 2) {
+    const watchFor = breed?.watchFor ? ` ${dog.name}'s breed is prone to ${breed.watchFor.split(',')[0].trim()}.` : '';
     tasks.push({
       type: 'WELLNESS',
       title: 'Quick wellness check',
-      subtitle: 'Any limping, off food, scratching, or off-mood?',
+      subtitle: `Any limping, off food, scratching, or off-mood?${watchFor}`,
       iconKey: 'heart',
       scheduledFor: forDate,
       timeOfDay: null,
@@ -92,11 +111,16 @@ export function buildTasksForDog(
   }
 
   // Training nudge (one daily)
-  const tip = pickTrainingTip(lifeStage(dog.dob));
+  const tip = pickTrainingTip(stage);
+  const stageHint = stage === 'puppy'
+    ? 'Short sessions stick best with puppies'
+    : stage === 'senior'
+      ? 'Gentle, low-impact reps suit senior dogs'
+      : 'Daily reps build a calm, engaged adult';
   tasks.push({
     type: 'TRAINING',
     title: '5-min training',
-    subtitle: tip,
+    subtitle: `${tip} · ${stageHint}`,
     iconKey: 'sparkle',
     scheduledFor: forDate,
     timeOfDay: null,

@@ -32,6 +32,13 @@ type Form = {
   social: number;
   /** Map of healthRecord name → ISO date string (yyyy-mm-dd) for "last given". Empty → unknown. */
   healthDates: Record<string, string>;
+  // Vet
+  vetName: string;
+  vetClinic: string;
+  vetPhone: string;
+  // Household
+  livesWithDogs: number;
+  livesWithKids: boolean;
 };
 
 const COMMON_CONDITIONS = ['Hip dysplasia', 'Allergies (skin)', 'Allergies (food)', 'Anxiety', 'Epilepsy', 'Arthritis', 'Heart murmur', 'Diabetes'];
@@ -56,6 +63,7 @@ const STEPS = [
   'Timeline',
   'Lifestyle',
   'Personality',
+  'Preview',
   'Done',
 ];
 
@@ -84,6 +92,11 @@ export default function OnboardingPage() {
     confidence: 3,
     social: 3,
     healthDates: {},
+    vetName: '',
+    vetClinic: '',
+    vetPhone: '',
+    livesWithDogs: 0,
+    livesWithKids: false,
   });
 
   const update = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
@@ -152,12 +165,13 @@ export default function OnboardingPage() {
           {step === 6 && <HealthTimelineStep form={form} update={update} />}
           {step === 7 && <LifestyleStep form={form} update={update} />}
           {step === 8 && <PersonalityStep form={form} update={update} />}
-          {step === 9 && <DoneStep form={form} onFinish={onFinish} submitting={submitting} error={error} />}
+          {step === 9 && <PreviewStep form={form} />}
+          {step === 10 && <DoneStep form={form} onFinish={onFinish} submitting={submitting} error={error} />}
         </div>
       </main>
 
       {/* nav buttons */}
-      {step > 0 && step < 9 && (
+      {step > 0 && step < 10 && (
         <div className="border-t border-ink/[0.07] bg-cream/85 backdrop-blur sticky bottom-0">
           <div className="mx-auto max-w-3xl px-5 py-4 flex items-center justify-between gap-3">
             <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))}>
@@ -602,6 +616,77 @@ function LifestyleStep({ form, update }: { form: Form; update: (p: Partial<Form>
             ))}
           </div>
         </div>
+
+        <div>
+          <label className="text-sm font-medium text-ink-soft">Lives with</label>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            <div>
+              <p className="text-[12px] text-ink-faint mb-1">Other dogs</p>
+              <div className="flex gap-2">
+                {[0, 1, 2].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => update({ livesWithDogs: n })}
+                    className={`flex-1 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                      form.livesWithDogs === n ? 'bg-moss text-cream border-moss' : 'bg-white border-ink/10 hover:border-ink/30'
+                    }`}
+                  >
+                    {n === 0 ? 'None' : n === 2 ? '2+' : n}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-[12px] text-ink-faint mb-1">Children at home</p>
+              <div className="flex gap-2">
+                {[
+                  { v: false, label: 'No' },
+                  { v: true, label: 'Yes' },
+                ].map((o) => (
+                  <button
+                    key={String(o.v)}
+                    onClick={() => update({ livesWithKids: o.v })}
+                    className={`flex-1 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                      form.livesWithKids === o.v ? 'bg-moss text-cream border-moss' : 'bg-white border-ink/10 hover:border-ink/30'
+                    }`}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-ink-soft">Your vet (optional)</label>
+          <p className="text-[12px] text-ink-faint mb-2">So Pawly knows where to point you when something needs a real check.</p>
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={form.vetClinic}
+              onChange={(e) => update({ vetClinic: e.target.value })}
+              placeholder="Clinic name"
+              className="w-full bg-white border border-ink/10 rounded-2xl px-5 py-3 text-base outline-none focus:border-moss"
+            />
+            <div className="grid sm:grid-cols-2 gap-2">
+              <input
+                type="text"
+                value={form.vetName}
+                onChange={(e) => update({ vetName: e.target.value })}
+                placeholder="Vet name"
+                className="w-full bg-white border border-ink/10 rounded-2xl px-5 py-3 text-base outline-none focus:border-moss"
+              />
+              <input
+                type="tel"
+                value={form.vetPhone}
+                onChange={(e) => update({ vetPhone: e.target.value })}
+                placeholder="Phone"
+                className="w-full bg-white border border-ink/10 rounded-2xl px-5 py-3 text-base outline-none focus:border-moss"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -637,6 +722,85 @@ function PersonalityStep({ form, update }: { form: Form; update: (p: Partial<For
       </div>
     </div>
   );
+}
+
+function PreviewStep({ form }: { form: Form }) {
+  const breed = useMemo(() => BREEDS.find((b) => b.name === form.breed), [form.breed]);
+  const weight = form.weight ? parseFloat(form.weight) : null;
+  const portion = weight
+    ? Math.round(weight * (
+        form.dob && monthsSinceLocal(form.dob) < 12 ? 28
+        : form.dob && monthsSinceLocal(form.dob) >= 84 ? 18
+        : 22
+      ))
+    : null;
+
+  // Build a tiny preview of what the first day looks like
+  const items: { icon: string; title: string; sub: string }[] = [
+    {
+      icon: '🥣',
+      title: form.feedingTimes[0] ? `Breakfast at ${form.feedingTimes[0]}` : 'Breakfast',
+      sub: portion
+        ? `~${portion}g of ${form.food || 'food'}, tailored to ${form.name}'s weight`
+        : `${form.food || 'Current food'} · split across ${form.feedingTimes.length || 2} meals`,
+    },
+    {
+      icon: '🚶',
+      title: `${Math.min(form.exerciseMins, 90)}-min walk`,
+      sub: breed
+        ? `${breed.name}s typically need ${breed.exercise.toLowerCase()}`
+        : `${form.walkStyle.toLowerCase().replace('_', '-')} walk`,
+    },
+    {
+      icon: '💛',
+      title: 'Weekly wellness check (Tuesdays)',
+      sub: breed
+        ? `Watch for ${breed.watchFor.split(',')[0].trim()} — common in ${breed.name}s`
+        : 'Quick scan for limping, off food, scratching, mood',
+    },
+    {
+      icon: '✨',
+      title: '5-min training, daily',
+      sub: 'We tailor the cue to age and personality',
+    },
+    {
+      icon: '🛡️',
+      title: 'Vaccination & parasite reminders',
+      sub: 'You\'ll see "Due soon" 30 days ahead and "Overdue" if missed',
+    },
+  ];
+
+  return (
+    <div>
+      <StepHeading
+        tag="09 / Preview"
+        title={`Here's what ${form.name || 'your dog'}'s first week looks like.`}
+        body="Personalised from everything you just told us. You can change any of it later."
+      />
+      <div className="space-y-2.5">
+        {items.map((it) => (
+          <div key={it.title} className="bg-white border border-ink/[0.06] rounded-2xl p-4 flex items-start gap-3 shadow-soft">
+            <div className="w-10 h-10 rounded-full bg-biscuit-soft flex items-center justify-center text-lg shrink-0">
+              {it.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium leading-tight">{it.title}</p>
+              <p className="text-[13px] text-ink-soft mt-0.5">{it.sub}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="text-[12px] text-ink-faint mt-5 text-center">
+        Pawly is not a substitute for veterinary advice. Anything urgent — call your vet.
+      </p>
+    </div>
+  );
+}
+
+function monthsSinceLocal(iso: string): number {
+  const a = new Date(iso);
+  const b = new Date();
+  return Math.max(0, Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24 * 30.44)));
 }
 
 function DoneStep({ form, onFinish, submitting, error }: {

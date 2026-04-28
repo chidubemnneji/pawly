@@ -24,9 +24,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // Future-proof for premium tiers without building paywall UI yet.
+  tier          String   @default("free")
+
   accounts Account[]
   sessions Session[]
   dogs     Dog[]
+  pushSubscriptions PushSubscription[]
 }
 
 model Account {
@@ -162,6 +166,8 @@ model Dog {
   tasks         Task[]
   healthRecords HealthRecord[]
   chatMessages  ChatMessage[]
+  weightLogs    WeightLog[]
+  diaryEntries  DiaryEntry[]
 
   @@index([userId])
 }
@@ -227,4 +233,46 @@ model ChatMessage {
   createdAt DateTime @default(now())
 
   @@index([dogId, createdAt])
+}
+
+model WeightLog {
+  id         String     @id @default(cuid())
+  dogId      String
+  dog        Dog        @relation(fields: [dogId], references: [id], onDelete: Cascade)
+
+  weight     Float
+  weightUnit WeightUnit @default(KG)
+  notedAt    DateTime   @default(now())
+  notes      String?
+
+  createdAt  DateTime   @default(now())
+
+  @@index([dogId, notedAt])
+}
+
+model DiaryEntry {
+  id        String   @id @default(cuid())
+  dogId     String
+  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+
+  photoUrl  String   @db.Text
+  caption   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([dogId, createdAt])
+}
+
+model PushSubscription {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  endpoint   String   @unique @db.Text
+  p256dh     String   @db.Text
+  authSecret String   @db.Text
+
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
 }
