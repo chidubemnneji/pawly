@@ -18,8 +18,13 @@ export default async function ProfilePage({
   return (
     <div className="px-5 md:px-10 py-8 max-w-3xl mx-auto space-y-6">
       <header className="flex items-end gap-5">
-        <div className="w-24 h-24 rounded-3xl bg-biscuit-soft flex items-center justify-center font-display text-4xl font-semibold text-moss-deep">
-          {dog.name[0]}
+        <div className="w-24 h-24 rounded-3xl bg-biscuit-soft flex items-center justify-center font-display text-4xl font-semibold text-moss-deep overflow-hidden shrink-0">
+          {dog.photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={dog.photoUrl} alt={dog.name} className="w-full h-full object-cover" />
+          ) : (
+            dog.name[0]
+          )}
         </div>
         <div>
           <h1 className="font-display text-4xl tracking-tight font-semibold leading-[1.05]">{dog.name}</h1>

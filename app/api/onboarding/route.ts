@@ -7,6 +7,7 @@ import { addDays } from '@/lib/utils';
 
 const onboardingSchema = z.object({
   name: z.string().trim().min(1),
+  photoUrl: z.string().max(800_000).optional().nullable(), // ~600KB data-url cap
   breed: z.string().optional().nullable(),
   dob: z.string().optional().nullable(),
   sex: z.enum(['M', 'F']).nullable().optional(),
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId: user.id,
         name: data.name,
+        photoUrl: data.photoUrl ?? null,
         breed: data.breed ?? null,
         dob: data.dob ? new Date(data.dob) : null,
         sex: data.sex ?? null,

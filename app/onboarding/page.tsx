@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
@@ -13,6 +13,8 @@ type Sex = 'M' | 'F' | null;
 
 type Form = {
   name: string;
+  /** JPEG data URL produced by client-side resize. Sent to /api/onboarding as photoUrl. */
+  photoDataUrl: string;
   breed: string;
   dob: string;
   sex: Sex;
@@ -65,6 +67,7 @@ export default function OnboardingPage() {
 
   const [form, setForm] = useState<Form>({
     name: '',
+    photoDataUrl: '',
     breed: '',
     dob: '',
     sex: null,
@@ -107,6 +110,7 @@ export default function OnboardingPage() {
         body: JSON.stringify({
           ...form,
           weight: form.weight ? parseFloat(form.weight) : null,
+          photoUrl: form.photoDataUrl || null,
         }),
       });
       if (!res.ok) {
@@ -204,17 +208,130 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
 function NameStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
   return (
     <div>
-      <StepHeading tag="01 / Name" title="What&rsquo;s your dog&rsquo;s name?" body="We&rsquo;ll use it throughout the app." />
+      <StepHeading tag="01 / Name" title="What&rsquo;s your dog&rsquo;s name?" body="Add a photo too — it personalises the whole app." />
+      <div className="flex items-center gap-5 mt-4">
+        <PhotoPicker
+          value={form.photoDataUrl}
+          name={form.name}
+          onChange={(dataUrl) => update({ photoDataUrl: dataUrl })}
+        />
+        <input
+          autoFocus
+          type="text"
+          value={form.name}
+          onChange={(e) => update({ name: e.target.value })}
+          placeholder="e.g. Bella"
+          className="flex-1 text-3xl font-display font-medium bg-transparent border-b-2 border-ink/15 focus:border-moss outline-none py-4 transition-colors"
+        />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Client-side image picker. Resizes to a max 480px square JPEG ~80% quality and
+ * hands back a data URL we can store in Dog.photoUrl. Avoids needing an external
+ * blob store for v0; can be replaced with a presigned-upload flow later.
+ */
+function PhotoPicker({
+  value,
+  name,
+  onChange,
+}: {
+  value: string;
+  name: string;
+  onChange: (dataUrl: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const handleFile = async (file: File) => {
+    setError(null);
+    if (!file.type.startsWith('image/')) {
+      setError('Please pick an image');
+      return;
+    }
+    if (file.size > 12 * 1024 * 1024) {
+      setError('Image is too large (max 12 MB)');
+      return;
+    }
+    setBusy(true);
+    try {
+      const dataUrl = await resizeImageToDataUrl(file, 480, 0.82);
+      onChange(dataUrl);
+    } catch {
+      setError("Couldn't process that image — try another");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className="relative w-24 h-24 rounded-full bg-biscuit-soft text-moss-deep font-display text-3xl font-semibold flex items-center justify-center overflow-hidden border-2 border-dashed border-ink/15 hover:border-moss transition-colors"
+        aria-label="Add a photo"
+      >
+        {value ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={value} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        ) : busy ? (
+          <span className="text-sm text-ink-soft">…</span>
+        ) : (
+          <span>{name?.[0]?.toUpperCase() ?? '+'}</span>
+        )}
+      </button>
+      <span className="text-[11px] text-ink-faint">
+        {value ? 'Tap to change' : 'Add photo'}
+      </span>
+      {error && <span className="text-[11px] text-danger">{error}</span>}
       <input
-        autoFocus
-        type="text"
-        value={form.name}
-        onChange={(e) => update({ name: e.target.value })}
-        placeholder="e.g. Bella"
-        className="w-full text-3xl font-display font-medium bg-transparent border-b-2 border-ink/15 focus:border-moss outline-none py-4 transition-colors"
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFile(file);
+          // reset so picking the same file twice still triggers
+          e.target.value = '';
+        }}
       />
     </div>
   );
+}
+
+async function resizeImageToDataUrl(file: File, maxSize: number, quality: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      const ratio = Math.min(1, maxSize / Math.max(width, height));
+      width = Math.round(width * ratio);
+      height = Math.round(height * ratio);
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        return reject(new Error('no canvas ctx'));
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('image load failed'));
+    };
+    img.src = url;
+  });
 }
 
 function BreedStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {

@@ -28,8 +28,13 @@ export function DogSwitcher({ dogs }: { dogs: DogLite[] }) {
   return (
     <div className="px-4">
       <div className="flex items-center gap-2 px-2 py-2.5 rounded-xl bg-white border border-ink/[0.06]">
-        <div className="w-9 h-9 rounded-full bg-biscuit-soft flex items-center justify-center font-display font-semibold text-moss-deep">
-          {active?.name?.[0] ?? '?'}
+        <div className="w-9 h-9 rounded-full bg-biscuit-soft flex items-center justify-center font-display font-semibold text-moss-deep overflow-hidden shrink-0">
+          {active?.photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={active.photoUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            active?.name?.[0] ?? '?'
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-medium leading-tight truncate">{active?.name ?? '—'}</p>
