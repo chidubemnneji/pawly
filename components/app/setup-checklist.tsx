@@ -48,7 +48,7 @@ export function SetupChecklist({ dog }: { dog: Dog }) {
   const pct = Math.round((completed / total) * 100);
 
   return (
-    <div className="bg-white border border-ink/[0.06] rounded-2xl p-4 shadow-soft">
+    <div className="glass rounded-2xl p-4">
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-[12px] uppercase tracking-wider text-ink-faint font-semibold">Finish setup</p>

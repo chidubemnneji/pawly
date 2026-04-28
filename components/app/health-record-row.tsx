@@ -37,7 +37,7 @@ export function HealthRecordRow({ record }: { record: HealthRecord }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-ink/[0.06] shadow-soft">
+    <div className="glass-strong rounded-2xl">
       <button onClick={() => setOpen((o) => !o)} className="w-full text-left p-4 flex items-center gap-3">
         <div className="w-11 h-11 rounded-full bg-moss-soft text-moss-deep flex items-center justify-center shrink-0">
           <Icon size={20} />

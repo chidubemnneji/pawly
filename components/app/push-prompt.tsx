@@ -69,7 +69,7 @@ export function PushPrompt({ vapidPublicKey }: { vapidPublicKey: string }) {
   if (state === 'unsupported' || state === 'subscribed' || state === 'unknown') return null;
 
   return (
-    <div className="bg-white border border-ink/[0.06] rounded-2xl p-4 shadow-soft">
+    <div className="glass rounded-2xl p-4">
       <p className="text-[12px] uppercase tracking-wider text-ink-faint font-semibold">Reminders</p>
       <p className="font-display text-lg font-semibold leading-tight mt-0.5">
         Get a nudge when something matters

@@ -9,7 +9,7 @@ type Props = {
 export function StreakCard({ pct, completed, total, streak, dogName }: Props) {
   if (total === 0) {
     return (
-      <div className="bg-white border border-ink/[0.06] rounded-2xl p-4 shadow-soft">
+      <div className="glass rounded-2xl p-4">
         <p className="text-[12px] uppercase tracking-wider text-ink-faint font-semibold">This week</p>
         <p className="font-display text-lg font-semibold mt-1">Just getting started 🌱</p>
         <p className="text-sm text-ink-soft mt-1">Complete a task to start your streak.</p>
@@ -31,7 +31,7 @@ export function StreakCard({ pct, completed, total, streak, dogName }: Props) {
   const offset = C * (1 - pct / 100);
 
   return (
-    <div className="bg-white border border-ink/[0.06] rounded-2xl p-4 shadow-soft flex items-center gap-4">
+    <div className="glass rounded-2xl p-4 flex items-center gap-4">
       <svg width="80" height="80" viewBox="0 0 80 80" className="shrink-0">
         <circle cx="40" cy="40" r={R} stroke="#E9E2D2" strokeWidth="6" fill="none" />
         <circle

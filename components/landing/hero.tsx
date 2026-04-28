@@ -5,11 +5,12 @@ import { CheckIcon } from '../icons';
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* soft sunrise gradient */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-x-0 top-0 h-[640px] bg-gradient-to-b from-biscuit-soft via-cream to-cream" />
-        <div className="absolute -top-24 -right-24 w-[420px] h-[420px] rounded-full bg-terracotta/10 blur-3xl" />
-        <div className="absolute -bottom-24 -left-32 w-[420px] h-[420px] rounded-full bg-moss/10 blur-3xl" />
+      {/* sunrise gradient mesh */}
+      <div className="absolute inset-0 -z-10 gradient-hero" />
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-[520px] h-[520px] rounded-full bg-terracotta/30 blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 w-[520px] h-[520px] rounded-full bg-moss/25 blur-3xl" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full bg-biscuit/30 blur-3xl" />
       </div>
 
       <div className="mx-auto max-w-6xl px-5 pt-16 pb-20 md:pt-24 md:pb-28">

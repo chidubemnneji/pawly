@@ -193,10 +193,10 @@ function Bubble({ msg }: { msg: Msg }) {
       <div
         className={`relative max-w-[85%] px-4 py-3 rounded-2xl whitespace-pre-wrap leading-relaxed ${
           isUser
-            ? 'bg-moss text-cream rounded-br-sm'
+            ? 'btn-gradient text-cream rounded-br-sm shadow-soft'
             : isUrgent
               ? 'bg-danger/10 text-ink border border-danger/30 rounded-bl-sm'
-              : 'bg-white text-ink shadow-soft rounded-bl-sm'
+              : 'glass-strong text-ink rounded-bl-sm'
         }`}
       >
         {isUrgent && (

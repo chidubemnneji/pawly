@@ -66,7 +66,7 @@ export function BottomNav() {
   const dog = search?.get('dog');
   const qs = dog ? `?dog=${dog}` : '';
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-30 bg-cream/90 backdrop-blur border-t border-ink/[0.07] md:hidden">
+    <nav className="fixed bottom-0 inset-x-0 z-30 bg-white/50 backdrop-blur-xl border-t border-white/40 md:hidden">
       <div className="grid grid-cols-4">
         {PRIMARY_ITEMS.map(({ href, label, Icon }) => {
           const active = pathname === href;

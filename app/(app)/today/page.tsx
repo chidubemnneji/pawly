@@ -104,18 +104,35 @@ export default async function TodayPage({
   })();
 
   return (
-    <div className="px-5 md:px-10 py-8 max-w-3xl mx-auto">
-      <header className="mb-8">
-        <p className="text-[13px] uppercase tracking-wider text-ink-faint font-semibold">
-          {today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
-        </p>
-        <h1 className="font-display text-4xl md:text-5xl tracking-tight font-semibold mt-1 leading-[1.05]">
-          {greeting}.
-        </h1>
-        <p className="text-ink-soft mt-2 text-lg">
-          {dog.name} · {ageFromDOB(dog.dob)} {lifeStage(dog.dob) !== 'unknown' ? lifeStage(dog.dob) : ''} {dog.breed ?? ''}
-          {dog.weight ? ` · ${dog.weight} ${dog.weightUnit.toLowerCase()}` : ''}
-        </p>
+    <div className="px-5 md:px-10 py-6 max-w-3xl mx-auto">
+      {/* Hero — gradient card with dog photo as anchor */}
+      <header className="gradient-hero rounded-[28px] p-6 md:p-8 mb-6 relative overflow-hidden border border-white/40 shadow-soft">
+        <div className="flex items-center gap-5 md:gap-7 relative">
+          <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl overflow-hidden shadow-lift bg-biscuit-soft flex items-center justify-center font-display text-3xl md:text-4xl font-semibold text-moss-deep shrink-0 ring-4 ring-white/60">
+            {dog.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={dog.photoUrl} alt={dog.name} className="w-full h-full object-cover" />
+            ) : (
+              dog.name[0]
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] uppercase tracking-wider text-ink-soft font-semibold">
+              {today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </p>
+            <h1 className="font-display text-3xl md:text-5xl tracking-tight font-semibold leading-[1.02] mt-0.5">
+              {greeting}, {dog.name}.
+            </h1>
+            <p className="text-ink-soft mt-2 text-[14px] md:text-base">
+              {[
+                ageFromDOB(dog.dob),
+                lifeStage(dog.dob) !== 'unknown' ? lifeStage(dog.dob) : '',
+                dog.breed ?? '',
+                dog.weight ? `${dog.weight} ${dog.weightUnit.toLowerCase()}` : '',
+              ].filter(Boolean).join(' · ')}
+            </p>
+          </div>
+        </div>
       </header>
 
       {urgentCount > 0 && (

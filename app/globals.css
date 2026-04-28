@@ -13,7 +13,6 @@
 }
 
 html, body {
-  background: var(--color-cream);
   color: var(--color-ink);
   font-feature-settings: "ss01", "cv11", "kern";
   -webkit-font-smoothing: antialiased;
@@ -22,6 +21,41 @@ html, body {
 
 body {
   min-height: 100vh;
+  background: var(--color-cream);
+  position: relative;
+}
+
+/* Ambient gradient mesh — fixed-position blurred blobs that warm the whole app.
+   Positioned in body::before/::after so every page benefits. */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 9999px;
+  filter: blur(120px);
+  opacity: 0.55;
+}
+body::before {
+  width: 720px;
+  height: 720px;
+  top: -200px;
+  right: -240px;
+  background: radial-gradient(closest-side, rgba(201, 105, 75, 0.55), rgba(233, 201, 160, 0.35) 60%, transparent 75%);
+}
+body::after {
+  width: 760px;
+  height: 760px;
+  bottom: -260px;
+  left: -260px;
+  background: radial-gradient(closest-side, rgba(63, 107, 78, 0.45), rgba(215, 229, 218, 0.35) 55%, transparent 75%);
+}
+
+/* Make sure foreground sits above the gradient */
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
@@ -35,11 +69,58 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Soft card */
+/* Soft card (legacy, opaque) */
 .card {
   background: white;
   border-radius: 18px;
   box-shadow: 0 1px 3px rgba(31,42,36,0.04), 0 6px 16px rgba(31,42,36,0.06);
+}
+
+/* ---- Glass surfaces ---- */
+.glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 1px 2px rgba(31, 42, 36, 0.04), 0 8px 24px rgba(31, 42, 36, 0.06);
+}
+.glass-strong {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 6px rgba(31, 42, 36, 0.06), 0 14px 40px rgba(31, 42, 36, 0.08);
+}
+.glass-dark {
+  background: linear-gradient(135deg, rgba(31, 42, 36, 0.85), rgba(44, 77, 56, 0.85));
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #FAF6F0;
+}
+
+/* ---- Hero gradient surfaces ---- */
+.gradient-hero {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(233, 201, 160, 0.55), transparent 60%),
+    radial-gradient(120% 80% at 100% 0%, rgba(201, 105, 75, 0.45), transparent 55%),
+    radial-gradient(120% 100% at 50% 100%, rgba(63, 107, 78, 0.32), transparent 60%),
+    linear-gradient(135deg, #FAF6F0 0%, #F2EBDD 100%);
+}
+.gradient-moss {
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(233, 201, 160, 0.40), transparent 60%),
+    radial-gradient(100% 100% at 0% 100%, rgba(201, 105, 75, 0.35), transparent 55%),
+    linear-gradient(135deg, #2C4D38 0%, #3F6B4E 60%, #5A8268 100%);
+  color: #FAF6F0;
+}
+.gradient-warm {
+  background: linear-gradient(135deg, #F7EBD7 0%, #E9C9A0 50%, #C9694B 110%);
+}
+
+/* Pill button gradient */
+.btn-gradient {
+  background: linear-gradient(135deg, #4A7E5B 0%, #3F6B4E 50%, #2C4D38 100%);
 }
 
 /* Range input — used by personality sliders */

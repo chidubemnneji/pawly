@@ -76,12 +76,12 @@ export function TaskCard({ task }: { task: Task }) {
   return (
     <div
       className={cn(
-        'relative w-full flex items-center gap-3 p-3.5 rounded-2xl border transition-all',
+        'relative w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all',
         muted
-          ? 'bg-ink/[0.03] border-transparent opacity-65'
+          ? 'bg-ink/[0.04] opacity-65'
           : isUrgent
-            ? 'bg-white border-danger/30 shadow-soft'
-            : 'bg-white border-ink/[0.06] shadow-soft',
+            ? 'glass-strong ring-1 ring-danger/30'
+            : 'glass-strong',
       )}
     >
       {/* Tap target — full row toggles complete (mark done / reopen) */}

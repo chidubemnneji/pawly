@@ -16,21 +16,28 @@ export default async function ProfilePage({
   const portion = suggestedPortion(dog.weight, dog.dob);
 
   return (
-    <div className="px-5 md:px-10 py-8 max-w-3xl mx-auto space-y-6">
-      <header className="flex items-end gap-5">
-        <div className="w-24 h-24 rounded-3xl bg-biscuit-soft flex items-center justify-center font-display text-4xl font-semibold text-moss-deep overflow-hidden shrink-0">
-          {dog.photoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={dog.photoUrl} alt={dog.name} className="w-full h-full object-cover" />
-          ) : (
-            dog.name[0]
-          )}
-        </div>
-        <div>
-          <h1 className="font-display text-4xl tracking-tight font-semibold leading-[1.05]">{dog.name}</h1>
-          <p className="text-ink-soft mt-1">
-            {dog.breed ?? 'Mixed breed'} · {ageFromDOB(dog.dob)} {stage !== 'unknown' ? stage : ''}
-          </p>
+    <div className="px-5 md:px-10 py-6 max-w-3xl mx-auto space-y-6">
+      {/* Full-bleed gradient hero with photo */}
+      <header className="gradient-warm rounded-[28px] overflow-hidden border border-white/40 shadow-soft relative">
+        <div className="absolute inset-0 bg-gradient-to-tr from-moss/30 via-transparent to-white/20 mix-blend-overlay" />
+        <div className="relative p-6 md:p-8 flex flex-col md:flex-row items-start md:items-end gap-5">
+          <div className="w-28 h-28 md:w-32 md:h-32 rounded-3xl bg-cream/60 backdrop-blur flex items-center justify-center font-display text-5xl font-semibold text-moss-deep overflow-hidden shrink-0 ring-4 ring-white/70 shadow-lift">
+            {dog.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={dog.photoUrl} alt={dog.name} className="w-full h-full object-cover" />
+            ) : (
+              dog.name[0]
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] uppercase tracking-wider text-ink/70 font-semibold">Profile</p>
+            <h1 className="font-display text-4xl md:text-5xl tracking-tight font-semibold leading-[1.02] mt-1 text-ink">
+              {dog.name}
+            </h1>
+            <p className="text-ink/80 mt-1 text-[15px]">
+              {dog.breed ?? 'Mixed breed'} · {ageFromDOB(dog.dob)} {stage !== 'unknown' ? stage : ''}
+            </p>
+          </div>
         </div>
       </header>
 

@@ -29,7 +29,7 @@ export default async function AppLayout({
   return (
     <div className="min-h-screen flex">
       {/* Sidebar (md+) */}
-      <aside className="hidden md:flex md:w-64 lg:w-72 flex-col border-r border-ink/[0.07] bg-cream/60 sticky top-0 h-screen">
+      <aside className="hidden md:flex md:w-64 lg:w-72 flex-col border-r border-white/40 bg-white/30 backdrop-blur-xl sticky top-0 h-screen">
         <div className="px-5 h-16 flex items-center border-b border-ink/[0.07]">
           <Link href="/today" aria-label="Pawly home"><Logo /></Link>
         </div>
@@ -48,7 +48,7 @@ export default async function AppLayout({
 
       <main className="flex-1 min-w-0 pb-20 md:pb-0">
         {/* Mobile header */}
-        <div className="md:hidden sticky top-0 z-20 bg-cream/85 backdrop-blur border-b border-ink/[0.07] px-5 h-14 flex items-center">
+        <div className="md:hidden sticky top-0 z-20 bg-white/40 backdrop-blur-xl border-b border-white/40 px-5 h-14 flex items-center">
           <Link href="/today" aria-label="Pawly home"><Logo /></Link>
         </div>
         {children}
