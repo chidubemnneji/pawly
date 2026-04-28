@@ -7,6 +7,9 @@ import { Logo } from '@/components/logo';
 import { DogSwitcher } from '@/components/app/dog-switcher';
 import { SideNav, BottomNav } from '@/components/app/nav';
 
+// These routes are per-user and hit Prisma — never statically pre-render them.
+export const dynamic = 'force-dynamic';
+
 export default async function AppLayout({
   children,
 }: {
