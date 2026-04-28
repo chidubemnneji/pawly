@@ -22,6 +22,8 @@ const onboardingSchema = z.object({
   energy: z.number().int().min(1).max(5).default(3),
   confidence: z.number().int().min(1).max(5).default(3),
   social: z.number().int().min(1).max(5).default(3),
+  /** Map of healthRecord name → ISO date string for "last given". Empty/missing → unknown. */
+  healthDates: z.record(z.string(), z.string()).default({}),
 });
 
 export async function POST(req: NextRequest) {
@@ -52,17 +54,28 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Seed health records (next-due roughly = today + interval, so the user can confirm later)
+    // Seed health records. If the user provided a "last given" date in onboarding,
+    // compute next-due from that. Otherwise leave lastGiven null and assume the
+    // record is fresh (next-due = today + interval) so the UI shows "Up to date"
+    // until the user confirms in the Health tab.
     const today = new Date();
     await prisma.healthRecord.createMany({
-      data: defaultHealthRecords().map((r) => ({
-        dogId: dog.id,
-        type: r.type,
-        name: r.name,
-        frequency: r.frequency,
-        intervalDays: r.intervalDays,
-        nextDue: addDays(today, r.intervalDays),
-      })),
+      data: defaultHealthRecords().map((r) => {
+        const lastGivenStr = data.healthDates[r.name];
+        const lastGiven = lastGivenStr ? new Date(lastGivenStr) : null;
+        const nextDue = lastGiven
+          ? addDays(lastGiven, r.intervalDays)
+          : addDays(today, r.intervalDays);
+        return {
+          dogId: dog.id,
+          type: r.type,
+          name: r.name,
+          frequency: r.frequency,
+          intervalDays: r.intervalDays,
+          lastGiven,
+          nextDue,
+        };
+      }),
     });
 
     return NextResponse.json({ dogId: dog.id });

@@ -28,10 +28,21 @@ type Form = {
   energy: number;
   confidence: number;
   social: number;
+  /** Map of healthRecord name → ISO date string (yyyy-mm-dd) for "last given". Empty → unknown. */
+  healthDates: Record<string, string>;
 };
 
 const COMMON_CONDITIONS = ['Hip dysplasia', 'Allergies (skin)', 'Allergies (food)', 'Anxiety', 'Epilepsy', 'Arthritis', 'Heart murmur', 'Diabetes'];
 const COMMON_ALLERGIES = ['Chicken', 'Beef', 'Wheat', 'Dairy', 'Pollen (env.)', 'Grass mites'];
+
+const TIMELINE_RECORDS: { key: string; label: string }[] = [
+  { key: 'DHPP (Distemper combo)', label: 'DHPP (Distemper combo)' },
+  { key: 'Leptospirosis', label: 'Leptospirosis' },
+  { key: 'Rabies', label: 'Rabies' },
+  { key: 'Bordetella (Kennel cough)', label: 'Bordetella (Kennel cough)' },
+  { key: 'Flea & Tick', label: 'Flea & Tick treatment' },
+  { key: 'Worming', label: 'Worming' },
+];
 
 const STEPS = [
   'Welcome',
@@ -40,6 +51,7 @@ const STEPS = [
   'Age',
   'Body',
   'Health',
+  'Timeline',
   'Lifestyle',
   'Personality',
   'Done',
@@ -68,6 +80,7 @@ export default function OnboardingPage() {
     energy: 3,
     confidence: 3,
     social: 3,
+    healthDates: {},
   });
 
   const update = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
@@ -132,14 +145,15 @@ export default function OnboardingPage() {
           {step === 3 && <AgeStep form={form} update={update} />}
           {step === 4 && <BodyStep form={form} update={update} />}
           {step === 5 && <HealthStep form={form} update={update} />}
-          {step === 6 && <LifestyleStep form={form} update={update} />}
-          {step === 7 && <PersonalityStep form={form} update={update} />}
-          {step === 8 && <DoneStep form={form} onFinish={onFinish} submitting={submitting} error={error} />}
+          {step === 6 && <HealthTimelineStep form={form} update={update} />}
+          {step === 7 && <LifestyleStep form={form} update={update} />}
+          {step === 8 && <PersonalityStep form={form} update={update} />}
+          {step === 9 && <DoneStep form={form} onFinish={onFinish} submitting={submitting} error={error} />}
         </div>
       </main>
 
       {/* nav buttons */}
-      {step > 0 && step < 8 && (
+      {step > 0 && step < 9 && (
         <div className="border-t border-ink/[0.07] bg-cream/85 backdrop-blur sticky bottom-0">
           <div className="mx-auto max-w-3xl px-5 py-4 flex items-center justify-between gap-3">
             <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))}>
@@ -368,10 +382,61 @@ function HealthStep({ form, update }: { form: Form; update: (p: Partial<Form>) =
   );
 }
 
+function HealthTimelineStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  const setDate = (key: string, value: string) => {
+    update({ healthDates: { ...form.healthDates, [key]: value } });
+  };
+  const clearDate = (key: string) => {
+    const next = { ...form.healthDates };
+    delete next[key];
+    update({ healthDates: next });
+  };
+
+  return (
+    <div>
+      <StepHeading
+        tag="06 / Timeline"
+        title={`When were these last given to ${form.name || 'your dog'}?`}
+        body="Skip any you're not sure about — we'll just remind you to check with your vet. You can update later in the Health tab."
+      />
+      <div className="space-y-2.5">
+        {TIMELINE_RECORDS.map((r) => {
+          const value = form.healthDates[r.key] || '';
+          return (
+            <div key={r.key} className="bg-white rounded-2xl border border-ink/10 p-4 flex items-center gap-3 flex-wrap sm:flex-nowrap">
+              <p className="font-medium text-[15px] flex-1 min-w-0">{r.label}</p>
+              <input
+                type="date"
+                max={today}
+                value={value}
+                onChange={(e) => setDate(r.key, e.target.value)}
+                className="bg-cream border border-ink/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-moss"
+              />
+              {value ? (
+                <button
+                  type="button"
+                  onClick={() => clearDate(r.key)}
+                  className="text-[12px] text-ink-faint hover:text-ink underline"
+                >
+                  Clear
+                </button>
+              ) : (
+                <span className="text-[12px] text-ink-faint">Not sure</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function LifestyleStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
   return (
     <div>
-      <StepHeading tag="06 / Lifestyle" title="Food and movement." body="Defaults are sensible for most dogs — adjust if you know better." />
+      <StepHeading tag="07 / Lifestyle" title="Food and movement." body="Defaults are sensible for most dogs — adjust if you know better." />
       <div className="space-y-6">
         <div>
           <label className="text-sm font-medium text-ink-soft">Current food (brand or type)</label>
@@ -447,7 +512,7 @@ function PersonalityStep({ form, update }: { form: Form; update: (p: Partial<For
 
   return (
     <div>
-      <StepHeading tag="07 / Personality" title="Who are they, really?" body="Helps us tailor training and behaviour tips." />
+      <StepHeading tag="08 / Personality" title="Who are they, really?" body="Helps us tailor training and behaviour tips." />
       <div className="space-y-7">
         <Slider label="Energy" value={form.energy} lowLabel="Couch buddy" highLabel="Always on" onChange={(v) => update({ energy: v })} />
         <Slider label="Confidence" value={form.confidence} lowLabel="Cautious" highLabel="Bold" onChange={(v) => update({ confidence: v })} />
