@@ -44,7 +44,7 @@ export function PushPrompt({ vapidPublicKey }: { vapidPublicKey: string }) {
       }
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlB64ToUint8Array(vapidPublicKey),
+        applicationServerKey: urlB64ToUint8Array(vapidPublicKey) as BufferSource,
       });
       const subJson = sub.toJSON();
       const res = await fetch('/api/push/subscribe', {
