@@ -7,7 +7,6 @@ const fraunces = Fraunces({
   variable: '--font-fraunces',
   display: 'swap',
   weight: ['400', '500', '600', '700'],
-  axes: ['SOFT', 'opsz'],
 });
 
 const inter = Inter({
