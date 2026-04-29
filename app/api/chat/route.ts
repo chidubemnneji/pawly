@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '@/lib/db';
-import { requireUser } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { auth } from '@/lib/auth';
 import { runChat } from '@/lib/ai';
+import { isEnabled } from '@/lib/flags';
 
 const chatSchema = z.object({
   dogId: z.string(),
@@ -11,52 +12,32 @@ const chatSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await requireUser();
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+
+    // Feature flag gate — ai-chat must be enabled for this user
+    const chatEnabled = await isEnabled('ai-chat', userId);
+    if (!chatEnabled) {
+      return NextResponse.json(
+        { error: 'feature_disabled', message: 'AI chat is not available yet.' },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const { dogId, message } = chatSchema.parse(body);
 
-    const dog = await prisma.dog.findFirst({ where: { id: dogId, userId: user.id } });
+    const dog = await db.dog.findFirst({ where: { id: dogId, userId } });
     if (!dog) return NextResponse.json({ error: 'not_found' }, { status: 404 });
 
-    // Pull last 10 messages for context
-    const history = await prisma.chatMessage.findMany({
-      where: { dogId: dog.id },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-      select: { role: true, content: true },
-    });
-    const orderedHistory = history
-      .reverse()
-      .filter((m) => m.role === 'USER' || m.role === 'ASSISTANT')
-      .map((m) => ({ role: m.role as 'USER' | 'ASSISTANT', content: m.content }));
-
-    // Persist user message
-    await prisma.chatMessage.create({
-      data: { dogId: dog.id, role: 'USER', content: message },
-    });
-
-    const reply = await runChat(dog, message, orderedHistory);
-
-    const assistantMsg = await prisma.chatMessage.create({
-      data: {
-        dogId: dog.id,
-        role: 'ASSISTANT',
-        content: reply.text,
-        severity: reply.severity,
-      },
-    });
-
-    return NextResponse.json({
-      assistantMessageId: assistantMsg.id,
-      text: reply.text,
-      severity: reply.severity,
-      followUps: reply.followUps,
-    });
-  } catch (e) {
-    if (e instanceof Error && e.message === 'UNAUTHENTICATED') {
-      return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
-    }
-    console.error('[/api/chat] failed:', e);
-    return NextResponse.json({ error: 'failed' }, { status: 500 });
+    const response = await runChat(dog, message, []);
+    return NextResponse.json(response);
+  } catch (err) {
+    console.error('[chat]', err);
+    return NextResponse.json({ error: 'internal' }, { status: 500 });
   }
 }

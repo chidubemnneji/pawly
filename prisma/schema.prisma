@@ -276,3 +276,32 @@ model PushSubscription {
 
   @@index([userId])
 }
+
+// =============================================================
+// Feature Flags
+// =============================================================
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique   // e.g. "ai-chat", "multi-dog"
+  description String
+  enabled     Boolean  @default(false)  // global default
+  rolloutPct  Int      @default(0)      // 0–100, % of users who get it when enabled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  overrides FlagOverride[]
+}
+
+// Per-user overrides — force on/off for specific users
+model FlagOverride {
+  id        String   @id @default(cuid())
+  flagId    String
+  flag      FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+  userId    String
+  enabled   Boolean  // overrides global + rollout
+  createdAt DateTime @default(now())
+
+  @@unique([flagId, userId])
+  @@index([userId])
+}

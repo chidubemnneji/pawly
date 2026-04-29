@@ -74,3 +74,8 @@ main()
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());
+
+// Seed feature flags
+import { seedFlags } from '../lib/flags'
+await seedFlags()
+console.log('Feature flags seeded')
