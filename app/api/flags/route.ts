@@ -1,24 +1,33 @@
 /**
  * GET /api/flags
- * Returns the evaluated flag map for the current user.
- * Used by client components to conditionally render features.
+ * Returns evaluated flag map for the current user + their detected geo context.
  *
- * POST /api/flags  (admin only — demo mode)
- * Toggle a flag on/off globally. In production this would be
- * gated behind an admin role check.
+ * Response: { flags: FlagMap, geo: { country, region } }
+ *
+ * POST /api/flags
+ * Toggle a flag globally or set a per-user override.
+ * Body: { key, enabled?, rolloutPct?, userId?, countries? }
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { getFlags, FLAG_KEYS } from '@/lib/flags'
+import { getGeoContext } from '@/lib/geo'
 import { db } from '@/lib/db'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth()
   const userId = session?.user?.id
 
-  const flags = await getFlags(userId)
-  return NextResponse.json(flags)
+  const [flags, geo] = await Promise.all([
+    getFlags(userId, req),
+    getGeoContext(req),
+  ])
+
+  return NextResponse.json({
+    flags,
+    geo: { country: geo.country, region: geo.region },
+  })
 }
 
 export async function POST(req: NextRequest) {
@@ -28,14 +37,14 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json()
-  const { key, enabled, rolloutPct, userId: targetUserId } = body
+  const { key, enabled, rolloutPct, userId: targetUserId, countries } = body
 
   if (!FLAG_KEYS.includes(key)) {
     return NextResponse.json({ error: 'Unknown flag key' }, { status: 400 })
   }
 
   // Per-user override
-  if (targetUserId) {
+  if (targetUserId !== undefined) {
     const flag = await db.featureFlag.findUnique({ where: { key } })
     if (!flag) return NextResponse.json({ error: 'Flag not found' }, { status: 404 })
 
@@ -44,14 +53,22 @@ export async function POST(req: NextRequest) {
       create: { flagId: flag.id, userId: targetUserId, enabled },
       update: { enabled },
     })
-    return NextResponse.json({ ok: true, mode: 'override', key, userId: targetUserId, enabled })
+    return NextResponse.json({ ok: true, mode: 'user-override', key, userId: targetUserId, enabled })
   }
 
   // Global update
-  const update: any = {}
+  const update: Record<string, unknown> = {}
   if (typeof enabled === 'boolean') update.enabled = enabled
   if (typeof rolloutPct === 'number') update.rolloutPct = Math.min(100, Math.max(0, rolloutPct))
+  if (Array.isArray(countries)) update.countries = countries
 
   const flag = await db.featureFlag.update({ where: { key }, data: update })
-  return NextResponse.json({ ok: true, mode: 'global', key, enabled: flag.enabled, rolloutPct: flag.rolloutPct })
+  return NextResponse.json({
+    ok: true,
+    mode: 'global',
+    key,
+    enabled: flag.enabled,
+    rolloutPct: flag.rolloutPct,
+    countries: flag.countries,
+  })
 }

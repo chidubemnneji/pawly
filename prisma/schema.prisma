@@ -287,6 +287,13 @@ model FeatureFlag {
   description String
   enabled     Boolean  @default(false)  // global default
   rolloutPct  Int      @default(0)      // 0–100, % of users who get it when enabled
+
+  // Geo targeting — ISO 3166-1 alpha-2 country codes.
+  // Empty array = available in ALL countries (no geo gate).
+  // Non-empty = only available in listed countries.
+  // Regions: UK_IE (GB,IE), EU (DE,FR,NL…), US, APAC (AU,NZ,SG…)
+  countries   String[] @default([])
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
