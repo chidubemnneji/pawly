@@ -7,8 +7,11 @@ const client = process.env.ANTHROPIC_API_KEY
   ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   : null;
 
-const MODEL_MAIN = 'claude-sonnet-4-6';
-const MODEL_TRIAGE = 'claude-haiku-4-5-20251001';
+// Model IDs are now controlled via feature flags (lib/aiModels.ts)
+// Default values here are fallbacks only — flags override at runtime
+const MODEL_MAIN_DEFAULT = 'claude-sonnet-4-6';
+const MODEL_TRIAGE_DEFAULT = 'claude-haiku-4-5-20251001';
+const MODEL_VISION_DEFAULT = 'claude-sonnet-4-6';
 
 const EMERGENCY_KEYWORDS = [
   'seizure', 'fitting', 'collapsed', 'unconscious', 'choking',
@@ -67,7 +70,7 @@ ${breed ? `\n## Breed notes for ${breed.name}\n- Typical exercise need: ${breed.
  * runTriage — quick keyword classifier (cheap), augmented by Haiku if available.
  * Returns true if the user's message describes a likely emergency.
  */
-async function runTriage(userMessage: string): Promise<boolean> {
+async function runTriage(userMessage: string, triageModel = MODEL_TRIAGE_DEFAULT): Promise<boolean> {
   const lower = userMessage.toLowerCase();
   if (EMERGENCY_KEYWORDS.some((k) => lower.includes(k))) return true;
 
@@ -79,7 +82,7 @@ async function runTriage(userMessage: string): Promise<boolean> {
 
   try {
     const res = await client.messages.create({
-      model: MODEL_TRIAGE,
+      model: triageModel,
       max_tokens: 8,
       system:
         'You are a veterinary triage classifier. Given a dog owner\'s message, reply with EXACTLY one word: URGENT or NORMAL. URGENT means the dog needs to see a vet within hours, not days. Be conservative — when in doubt, NORMAL.',
@@ -105,9 +108,12 @@ If you'd like, I can help you decide what to tell them on the phone.`;
 export async function runChat(
   dog: Dog,
   userMessage: string,
-  history: { role: 'USER' | 'ASSISTANT'; content: string }[]
+  history: { role: 'USER' | 'ASSISTANT'; content: string }[],
+  modelConfig?: { reasoning?: string; triage?: string }
 ): Promise<ChatResponse> {
-  const isUrgent = await runTriage(userMessage);
+  const reasoningModel = modelConfig?.reasoning || MODEL_MAIN_DEFAULT;
+  const triageModel = modelConfig?.triage || MODEL_TRIAGE_DEFAULT;
+  const isUrgent = await runTriage(userMessage, triageModel);
   if (isUrgent) {
     return {
       text: URGENT_RESPONSE,
@@ -122,7 +128,7 @@ export async function runChat(
 
   try {
     const res = await client.messages.create({
-      model: MODEL_MAIN,
+      model: reasoningModel,
       max_tokens: 600,
       system: buildSystemPrompt(dog),
       messages: [
@@ -215,4 +221,109 @@ function mockChat(dog: Dog, userMessage: string): ChatResponse {
     severity: 'NORMAL',
     followUps: ['Plan my week', `Tell me about ${breed}s`],
   };
+}
+
+// ── Vision / Photo Analysis ───────────────────────────────────────────────
+// Gated behind ai-vision-enabled flag — rolled out independently from chat.
+// Uses the same Anthropic client but with image input for analysing photos
+// of the dog (skin conditions, body condition score, wound assessment).
+
+export type VisionResponse = {
+  text: string
+  severity: 'NORMAL' | 'URGENT' | 'UNSUPPORTED'
+  observations: string[]  // structured findings from the image
+}
+
+/**
+ * Analyse a photo of a dog and return structured observations.
+ * Model is passed in from flag config — can be updated without redeployment.
+ *
+ * @param imageBase64 - base64-encoded image data
+ * @param mediaType   - image MIME type (image/jpeg, image/png etc)
+ * @param dog         - dog profile for personalised context
+ * @param userQuestion - optional question about the image
+ * @param visionModel  - model ID from flag (default: claude-sonnet-4-6)
+ */
+export async function analysePhoto(
+  imageBase64: string,
+  mediaType: 'image/jpeg' | 'image/png' | 'image/webp',
+  dog: Dog,
+  userQuestion?: string,
+  visionModel = MODEL_VISION_DEFAULT,
+): Promise<VisionResponse> {
+  if (!client) {
+    return {
+      text: `Photo analysis isn't available in demo mode. Add an Anthropic API key to enable it.`,
+      severity: 'UNSUPPORTED',
+      observations: [],
+    }
+  }
+
+  const prompt = userQuestion
+    ? `The owner asks: "${userQuestion}"\n\nPlease analyse this photo of ${dog.name} (${dog.breed ?? 'dog'}) and answer their question, noting any relevant observations.`
+    : `Please analyse this photo of ${dog.name} (${dog.breed ?? 'dog'}) and describe what you observe about their physical condition, coat, body condition score, or any visible concerns.`
+
+  const systemPrompt = `You are Pawly, an AI dog care companion. You are analysing a photo submitted by a dog owner.
+
+Dog profile:
+- Name: ${dog.name}
+- Breed: ${dog.breed ?? 'Unknown'}
+- Age: ${dog.dob ? new Date().getFullYear() - new Date(dog.dob).getFullYear() + ' years' : 'Unknown'}
+- Known conditions: ${dog.conditions.length ? dog.conditions.join(', ') : 'None'}
+
+Rules:
+- Describe only what is visible in the image
+- Be specific about location on the body (e.g. "on the left flank", "between the toes")
+- If you see anything that warrants urgent vet attention, say so clearly
+- Never diagnose — describe and recommend
+- Keep it practical and calm
+- End with "I'd always recommend a vet check if you're concerned" for any health-related observations
+
+Return your response as JSON with this shape:
+{
+  "text": "your main response in 2-4 sentences",
+  "severity": "NORMAL" | "URGENT",
+  "observations": ["observation 1", "observation 2", ...]
+}`
+
+  try {
+    const res = await client.messages.create({
+      model: visionModel,
+      max_tokens: 600,
+      system: systemPrompt,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: { type: 'base64', media_type: mediaType, data: imageBase64 },
+          },
+          { type: 'text', text: prompt },
+        ],
+      }],
+    })
+
+    const block = res.content[0]
+    const rawText = block?.type === 'text' ? block.text.trim() : ''
+
+    // Parse JSON response
+    try {
+      const parsed = JSON.parse(rawText.replace(/```json\n?|\n?```/g, ''))
+      return {
+        text: parsed.text ?? rawText,
+        severity: parsed.severity === 'URGENT' ? 'URGENT' : 'NORMAL',
+        observations: Array.isArray(parsed.observations) ? parsed.observations : [],
+      }
+    } catch {
+      // JSON parse failed — return raw text
+      return { text: rawText, severity: 'NORMAL', observations: [] }
+    }
+  } catch (err) {
+    console.error('[ai] vision analysis failed:', err)
+    return {
+      text: `Sorry, I couldn't analyse that photo right now. Please try again.`,
+      severity: 'NORMAL',
+      observations: [],
+    }
+  }
 }

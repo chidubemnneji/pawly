@@ -55,7 +55,7 @@ export const FLAG_KEYS = [
 ] as const
 
 export type FlagKey = typeof FLAG_KEYS[number]
-export type FlagMap = Record<FlagKey, boolean>
+export type FlagMap = Record<FlagKey, boolean | string>
 
 // Deterministic bucketing — same user always in same bucket (no flicker)
 function hashUserIntoBucket(userId: string, flagKey: string): number {
@@ -81,6 +81,11 @@ export async function getFlags(
   const result = {} as FlagMap
   for (const key of FLAG_KEYS) result[key] = false
 
+  // Model flags default to their stable model IDs
+  result['ai-reasoning-model'] = 'claude-sonnet-4-6'
+  result['ai-triage-model'] = 'claude-haiku-4-5-20251001'
+  result['ai-vision-model'] = 'claude-sonnet-4-6'
+
   // Resolve geo context once — cached per IP
   const geo = await getGeoContext(req).catch(() => ({ country: 'GB', region: 'UK_IE' as const, ip: '' }))
 
@@ -101,6 +106,12 @@ export async function getFlags(
       if (override !== undefined) {
         // Per-user override always wins — bypasses geo gate too
         result[flag.key as FlagKey] = override.enabled
+        continue
+      }
+
+      // String-valued flags (model IDs) — return the string when flag is enabled
+      if (flag.stringValue && flag.enabled) {
+        result[flag.key as FlagKey] = flag.stringValue
         continue
       }
 
@@ -177,6 +188,14 @@ export async function seedFlags() {
 
     // EU
     { key: 'eu-pet-passport',        description: 'EU pet passport documentation guidance',   enabled: true,  rolloutPct: 100, countries: COUNTRIES.EU },
+
+    // AI model governance flags — stringValue stores the model ID
+    // To upgrade a model: update stringValue in the DB or via /api/flags
+    // To roll back: set enabled: false → falls back to MODEL_DEFAULTS in aiModels.ts
+    { key: 'ai-reasoning-model',    description: 'Reasoning model ID for chat responses',         enabled: true,  rolloutPct: 100, countries: [], stringValue: 'claude-sonnet-4-6' },
+    { key: 'ai-triage-model',       description: 'Triage classifier model ID',                    enabled: true,  rolloutPct: 100, countries: [], stringValue: 'claude-haiku-4-5-20251001' },
+    { key: 'ai-vision-model',       description: 'Vision model ID for photo analysis',            enabled: true,  rolloutPct: 100, countries: [], stringValue: 'claude-sonnet-4-6' },
+    { key: 'ai-vision-enabled',     description: 'Enable photo analysis feature',                 enabled: false, rolloutPct: 0,   countries: [] },
   ]
 
   for (const flag of defaults) {

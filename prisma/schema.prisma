@@ -287,6 +287,9 @@ model FeatureFlag {
   description String
   enabled     Boolean  @default(false)  // global default
   rolloutPct  Int      @default(0)      // 0–100, % of users who get it when enabled
+  // Optional string value — used for model ID flags (e.g. "claude-sonnet-4-6")
+  // When set, getFlags() returns this string instead of the boolean enabled value
+  stringValue String?  @default("")
 
   // Geo targeting — ISO 3166-1 alpha-2 country codes.
   // Empty array = available in ALL countries (no geo gate).

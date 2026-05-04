@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { auth } from '@/lib/auth';
 import { runChat } from '@/lib/ai';
 import { isEnabled } from '@/lib/flags';
+import { getModelConfig } from '@/lib/aiModels';
 
 const chatSchema = z.object({
   dogId: z.string(),
@@ -34,8 +35,20 @@ export async function POST(req: NextRequest) {
     const dog = await db.dog.findFirst({ where: { id: dogId, userId } });
     if (!dog) return NextResponse.json({ error: 'not_found' }, { status: 404 });
 
-    const response = await runChat(dog, message, []);
-    return NextResponse.json(response);
+    // Resolve model config from feature flags — each model rolled out independently
+    // reasoning model and triage model can be on different rollout percentages
+    const modelConfig = await getModelConfig(userId, req as any);
+
+    const response = await runChat(dog, message, [], {
+      reasoning: modelConfig.reasoning,
+      triage: modelConfig.triage,
+    });
+
+    return NextResponse.json({
+      ...response,
+      // Expose which model was used — useful for debugging and analytics
+      _meta: { model: modelConfig.reasoning },
+    });
   } catch (err) {
     console.error('[chat]', err);
     return NextResponse.json({ error: 'internal' }, { status: 500 });
