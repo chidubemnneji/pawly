@@ -165,29 +165,29 @@ export async function seedFlags() {
   }> = [
     // Global flags
     { key: 'ai-chat',               description: 'AI companion chat',                         enabled: true,  rolloutPct: 100, countries: [] },
-    { key: 'multi-dog',             description: 'Multiple dog profiles',                      enabled: false, rolloutPct: 0,   countries: [] },
+    { key: 'multi-dog',             description: 'Multiple dog profiles',                      enabled: true,  rolloutPct: 100, countries: [] },
     { key: 'weight-tracking',       description: 'Weight chart and trend analysis',             enabled: true,  rolloutPct: 100, countries: [] },
     { key: 'push-notifications',    description: 'Web push notification opt-in',               enabled: true,  rolloutPct: 100, countries: [] },
     { key: 'breed-insights',        description: 'Expanded breed-specific insight cards',      enabled: true,  rolloutPct: 100, countries: [] },
-    { key: 'photo-diary',           description: 'Photo diary and growth timeline',            enabled: false, rolloutPct: 0,   countries: [] },
+    { key: 'photo-diary',           description: 'Photo diary and growth timeline',            enabled: true,  rolloutPct: 100, countries: [] },
 
     // UK / IE
-    { key: 'leptospirosis-reminder', description: 'Leptospirosis as a core vaccine (UK/IE)',  enabled: true,  rolloutPct: 100, countries: [...COUNTRIES.UK_IE, ...COUNTRIES.EU] },
-    { key: 'vet-integration',        description: 'Vet booking CTA — UK/IE first',            enabled: false, rolloutPct: 0,   countries: COUNTRIES.UK_IE },
+    { key: 'leptospirosis-reminder', description: 'Leptospirosis as a core vaccine (UK/IE)',  enabled: true,  rolloutPct: 100, countries: [] },
+    { key: 'vet-integration',        description: 'Vet booking CTA — UK/IE first',            enabled: true,  rolloutPct: 100, countries: [] },
 
     // US
-    { key: 'rabies-annual-reminder', description: 'Annual rabies reminder (state-dependent)',  enabled: true,  rolloutPct: 100, countries: COUNTRIES.US },
-    { key: 'us-insurance-affiliate', description: 'Lemonade/Trupanion affiliate cards',       enabled: true,  rolloutPct: 50,  countries: COUNTRIES.US },
+    { key: 'rabies-annual-reminder', description: 'Annual rabies reminder (state-dependent)',  enabled: true,  rolloutPct: 100, countries: [] },
+    { key: 'us-insurance-affiliate', description: 'Lemonade/Trupanion affiliate cards',       enabled: true,  rolloutPct: 100, countries: [] },
 
     // UK + US
-    { key: 'affiliate-pet-insurance', description: 'Pet insurance comparison — UK + US',      enabled: true,  rolloutPct: 30,  countries: [...COUNTRIES.UK_IE, ...COUNTRIES.US] },
+    { key: 'affiliate-pet-insurance', description: 'Pet insurance comparison — UK + US',      enabled: true,  rolloutPct: 100, countries: [] },
 
     // APAC
-    { key: 'heartworm-reminder',     description: 'Heartworm prevention reminder (APAC)',      enabled: true,  rolloutPct: 100, countries: COUNTRIES.APAC },
-    { key: 'apac-insurance-affiliate', description: 'AU/NZ insurance affiliate cards',        enabled: false, rolloutPct: 0,   countries: COUNTRIES.APAC },
+    { key: 'heartworm-reminder',     description: 'Heartworm prevention reminder (APAC)',      enabled: true,  rolloutPct: 100, countries: [] },
+    { key: 'apac-insurance-affiliate', description: 'AU/NZ insurance affiliate cards',        enabled: true,  rolloutPct: 100, countries: [] },
 
     // EU
-    { key: 'eu-pet-passport',        description: 'EU pet passport documentation guidance',   enabled: true,  rolloutPct: 100, countries: COUNTRIES.EU },
+    { key: 'eu-pet-passport',        description: 'EU pet passport documentation guidance',   enabled: true,  rolloutPct: 100, countries: [] },
 
     // AI model governance flags — stringValue stores the model ID
     // To upgrade a model: update stringValue in the DB or via /api/flags
@@ -195,7 +195,7 @@ export async function seedFlags() {
     { key: 'ai-reasoning-model',    description: 'Reasoning model ID for chat responses',         enabled: true,  rolloutPct: 100, countries: [], stringValue: 'claude-sonnet-4-6' },
     { key: 'ai-triage-model',       description: 'Triage classifier model ID',                    enabled: true,  rolloutPct: 100, countries: [], stringValue: 'claude-haiku-4-5-20251001' },
     { key: 'ai-vision-model',       description: 'Vision model ID for photo analysis',            enabled: true,  rolloutPct: 100, countries: [], stringValue: 'claude-sonnet-4-6' },
-    { key: 'ai-vision-enabled',     description: 'Enable photo analysis feature',                 enabled: false, rolloutPct: 0,   countries: [] },
+    { key: 'ai-vision-enabled',     description: 'Enable photo analysis feature',                 enabled: true,  rolloutPct: 100, countries: [] },
   ]
 
   for (const flag of defaults) {
