@@ -52,6 +52,12 @@ export const FLAG_KEYS = [
 
   // Geo-gated: EU
   'eu-pet-passport',          // EU pet passport documentation guidance
+
+  // AI model governance — each model independently versioned + rolled out
+  'ai-reasoning-model',       // Model ID for chat reasoning (string value)
+  'ai-triage-model',          // Model ID for emergency triage classifier (string value)
+  'ai-vision-model',          // Model ID for photo analysis (string value)
+  'ai-vision-enabled',        // Master switch for vision / photo analysis feature
 ] as const
 
 export type FlagKey = typeof FLAG_KEYS[number]
