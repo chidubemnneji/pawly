@@ -87,7 +87,7 @@ export function ChatView({
       let data: any;
 
       if (image) {
-        // Vision path — photo attached
+        // Vision path - photo attached
         const res = await fetch('/api/vision', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -248,7 +248,7 @@ export function ChatView({
               </button>
             </div>
             <p className="text-sm text-ink-soft">
-              Photo ready — type a question or send to analyse
+              Photo ready - type a question or send to analyse
             </p>
           </div>
         </div>
@@ -273,7 +273,7 @@ export function ChatView({
           className="max-w-3xl mx-auto flex items-end gap-2"
           onSubmit={(e) => { e.preventDefault(); send(input); }}
         >
-          {/* Camera button — only shown when ai-vision-enabled flag is true */}
+          {/* Camera button - only shown when ai-vision-enabled flag is true */}
           {visionEnabled && (
             <button
               type="button"
@@ -314,7 +314,7 @@ export function ChatView({
           </button>
         </form>
         <p className="text-[11px] text-ink-faint text-center mt-2 max-w-3xl mx-auto">
-          Pawly is helpful guidance — not a substitute for veterinary advice.
+          Pawly is helpful guidance - not a substitute for veterinary advice.
         </p>
       </div>
     </div>
@@ -347,13 +347,13 @@ function Bubble({ msg }: { msg: Msg }) {
       >
         {isUrgent && (
           <p className="text-[11px] uppercase tracking-wider font-semibold text-danger mb-1.5">
-            Urgent — call your vet
+            Urgent - call your vet
           </p>
         )}
         <p className="text-[15px]">{msg.content}</p>
       </div>
 
-      {/* Vision observations — structured findings shown as pills */}
+      {/* Vision observations - structured findings shown as pills */}
       {msg.observations && msg.observations.length > 0 && (
         <div className="mt-2 ml-2 max-w-[85%]">
           <p className="text-[11px] text-ink-faint mb-1.5 font-medium uppercase tracking-wider">
@@ -374,7 +374,7 @@ function Bubble({ msg }: { msg: Msg }) {
 
       {!isUser && !isUrgent && (
         <p className="text-[11px] text-ink-faint mt-1 ml-2 max-w-[85%]">
-          General guidance — not vet advice. Always check with your vet for medical concerns.
+          General guidance - not vet advice. Always check with your vet for medical concerns.
         </p>
       )}
     </div>

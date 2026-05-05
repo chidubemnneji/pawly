@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     const userId = session.user.id;
 
-    // Feature flag gate — ai-chat must be enabled for this user
+    // Feature flag gate - ai-chat must be enabled for this user
     const chatEnabled = await isEnabled('ai-chat', userId);
     if (!chatEnabled) {
       return NextResponse.json(
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     const dog = await db.dog.findFirst({ where: { id: dogId, userId } });
     if (!dog) return NextResponse.json({ error: 'not_found' }, { status: 404 });
 
-    // Resolve model config from feature flags — each model rolled out independently
+    // Resolve model config from feature flags - each model rolled out independently
     // reasoning model and triage model can be on different rollout percentages
     const modelConfig = await getModelConfig(userId, req as any);
 
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ...response,
-      // Expose which model was used — useful for debugging and analytics
+      // Expose which model was used - useful for debugging and analytics
       _meta: { model: modelConfig.reasoning },
     });
   } catch (err) {

@@ -75,7 +75,7 @@ export function PushPrompt({ vapidPublicKey }: { vapidPublicKey: string }) {
         Get a nudge when something matters
       </p>
       <p className="text-sm text-ink-soft mt-1">
-        We&rsquo;ll send a notification for things like overdue parasite treatments — never spam.
+        We&rsquo;ll send a notification for things like overdue parasite treatments - never spam.
       </p>
       {state === 'denied' ? (
         <p className="text-[12px] text-warn mt-2">

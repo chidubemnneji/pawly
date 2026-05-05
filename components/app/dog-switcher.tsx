@@ -37,7 +37,7 @@ export function DogSwitcher({ dogs }: { dogs: DogLite[] }) {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium leading-tight truncate">{active?.name ?? '—'}</p>
+          <p className="font-medium leading-tight truncate">{active?.name ?? '-'}</p>
           <p className="text-[12px] text-ink-faint truncate">{active?.breed ?? 'Mixed breed'}</p>
         </div>
         {dogs.length > 1 && (

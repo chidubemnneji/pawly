@@ -17,7 +17,7 @@ export function LandingNav() {
         </nav>
         <div className="flex items-center gap-2">
           <Link href="/onboarding" className="hidden sm:inline-flex">
-            <Button size="sm">Get started — free</Button>
+            <Button size="sm">Get started - free</Button>
           </Link>
           <Link href="/onboarding" className="sm:hidden">
             <Button size="sm">Start</Button>

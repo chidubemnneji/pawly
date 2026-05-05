@@ -35,7 +35,7 @@ export default async function BreedPage({ params }: { params: Promise<{ slug: st
           {breed.name}
         </h1>
         <p className="text-ink-soft mt-4 text-lg max-w-2xl leading-relaxed">
-          A care guide for {breed.name} owners. Personalised guidance — feeding, exercise, training, health — comes from setting up your dog&rsquo;s profile.
+          A care guide for {breed.name} owners. Personalised guidance - feeding, exercise, training, health - comes from setting up your dog&rsquo;s profile.
         </p>
 
         <div className="mt-10 grid sm:grid-cols-2 gap-4">
@@ -50,7 +50,7 @@ export default async function BreedPage({ params }: { params: Promise<{ slug: st
             Get personalised care for your {breed.name}
           </h2>
           <p className="text-cream/85 mt-2 max-w-md">
-            Pawly tailors feeding, exercise targets and reminders to your dog specifically — not a generic breed average.
+            Pawly tailors feeding, exercise targets and reminders to your dog specifically - not a generic breed average.
           </p>
           <div className="mt-6">
             <Link href="/onboarding">

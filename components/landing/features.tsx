@@ -4,7 +4,7 @@ const FEATURES = [
   {
     Icon: BowlIcon,
     title: 'Right portion, every meal',
-    body: 'We calculate calories from breed, age, weight and activity — and update as your dog changes.',
+    body: 'We calculate calories from breed, age, weight and activity - and update as your dog changes.',
   },
   {
     Icon: WalkIcon,
@@ -14,7 +14,7 @@ const FEATURES = [
   {
     Icon: ShieldIcon,
     title: 'Vaccines & parasite reminders',
-    body: 'Never miss a booster, flea treatment or worming. Push and email — pick what works.',
+    body: 'Never miss a booster, flea treatment or worming. Push and email - pick what works.',
   },
   {
     Icon: ChatIcon,
@@ -24,12 +24,12 @@ const FEATURES = [
   {
     Icon: SparkleIcon,
     title: 'Daily training nudges',
-    body: '5-minute, breed-aware tips. Recall, loose-lead, calm settles — small wins, big change.',
+    body: '5-minute, breed-aware tips. Recall, loose-lead, calm settles - small wins, big change.',
   },
   {
     Icon: HeartIcon,
     title: 'Weekly wellness check',
-    body: 'A 30-second pulse: limping, off food, scratching, mood — before issues become problems.',
+    body: 'A 30-second pulse: limping, off food, scratching, mood - before issues become problems.',
   },
 ];
 

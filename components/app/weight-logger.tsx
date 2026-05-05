@@ -35,7 +35,7 @@ export function WeightLogger({ dogId, defaultUnit }: { dogId: string; defaultUni
       setNotes('');
       startTransition(() => router.refresh());
     } catch {
-      setError("Couldn't save — try again");
+      setError("Couldn't save - try again");
     } finally {
       setSubmitting(false);
     }

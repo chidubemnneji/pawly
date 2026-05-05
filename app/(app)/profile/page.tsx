@@ -44,14 +44,14 @@ export default async function ProfilePage({
       <Card>
         <CardHeader><CardTitle>The basics</CardTitle></CardHeader>
         <CardBody className="grid sm:grid-cols-2 gap-4">
-          <Field label="Sex" value={dog.sex === 'F' ? 'Female' : dog.sex === 'M' ? 'Male' : '—'} />
-          <Field label="Neutered" value={dog.neutered === true ? 'Yes' : dog.neutered === false ? 'No' : '—'} />
-          <Field label="Weight" value={dog.weight ? `${dog.weight} ${dog.weightUnit.toLowerCase()}` : '—'} />
+          <Field label="Sex" value={dog.sex === 'F' ? 'Female' : dog.sex === 'M' ? 'Male' : '-'} />
+          <Field label="Neutered" value={dog.neutered === true ? 'Yes' : dog.neutered === false ? 'No' : '-'} />
+          <Field label="Weight" value={dog.weight ? `${dog.weight} ${dog.weightUnit.toLowerCase()}` : '-'} />
           <Field
             label="Typical for breed"
-            value={breed ? `${breed.weightKg[0]}–${breed.weightKg[1]} kg` : '—'}
+            value={breed ? `${breed.weightKg[0]}–${breed.weightKg[1]} kg` : '-'}
           />
-          <Field label="Born" value={dog.dob ? new Date(dog.dob).toLocaleDateString('en-GB') : '—'} />
+          <Field label="Born" value={dog.dob ? new Date(dog.dob).toLocaleDateString('en-GB') : '-'} />
           <Field label="Life stage" value={stage} />
         </CardBody>
       </Card>
@@ -59,7 +59,7 @@ export default async function ProfilePage({
       <Card>
         <CardHeader><CardTitle>Diet & feeding</CardTitle></CardHeader>
         <CardBody className="space-y-4">
-          <Field label="Current food" value={dog.food ?? '—'} />
+          <Field label="Current food" value={dog.food ?? '-'} />
           <Field label="Suggested portion" value={`~${portion} g/day · split across ${dog.feedingTimes.length || 2} meals`} />
           <Field label="Feeding times" value={(dog.feedingTimes ?? []).join(' · ')} />
         </CardBody>
@@ -101,7 +101,7 @@ export default async function ProfilePage({
 
       {breed && (
         <Card>
-          <CardHeader><CardTitle>{breed.name} — what to know</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{breed.name} - what to know</CardTitle></CardHeader>
           <CardBody className="space-y-3">
             <Field label="Group" value={breed.group} />
             <Field label="Typical exercise" value={breed.exercise} />
@@ -118,7 +118,7 @@ function Field({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
       <p className="text-[12px] uppercase tracking-wider text-ink-faint font-semibold">{label}</p>
-      <p className="text-[15px] mt-0.5">{value || '—'}</p>
+      <p className="text-[15px] mt-0.5">{value || '-'}</p>
     </div>
   );
 }

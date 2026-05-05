@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 /**
- * Pawly logo — paw-mark + wordmark.
+ * Pawly logo - paw-mark + wordmark.
  * Use `withWordmark={false}` for the icon-only variant (favicons, app icons).
  */
 export function Logo({

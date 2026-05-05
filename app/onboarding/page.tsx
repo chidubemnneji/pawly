@@ -209,7 +209,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
         Let&rsquo;s build your dog&rsquo;s profile.
       </h1>
       <p className="text-ink-soft mt-5 text-lg max-w-xl mx-auto">
-        Eight quick questions. About two minutes. We&rsquo;ll personalise everything based on your answers — feeding, walks, training, health.
+        Eight quick questions. About two minutes. We&rsquo;ll personalise everything based on your answers - feeding, walks, training, health.
       </p>
       <div className="mt-10">
         <Button size="lg" onClick={onNext}>Start <ChevronRightIcon size={18} /></Button>
@@ -222,7 +222,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
 function NameStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
   return (
     <div>
-      <StepHeading tag="01 / Name" title="What&rsquo;s your dog&rsquo;s name?" body="Add a photo too — it personalises the whole app." />
+      <StepHeading tag="01 / Name" title="What&rsquo;s your dog&rsquo;s name?" body="Add a photo too - it personalises the whole app." />
       <div className="flex items-center gap-5 mt-4">
         <PhotoPicker
           value={form.photoDataUrl}
@@ -275,7 +275,7 @@ function PhotoPicker({
       const dataUrl = await resizeImageToDataUrl(file, 480, 0.82);
       onChange(dataUrl);
     } catch {
-      setError("Couldn't process that image — try another");
+      setError("Couldn't process that image - try another");
     } finally {
       setBusy(false);
     }
@@ -398,7 +398,7 @@ function BreedStep({ form, update }: { form: Form; update: (p: Partial<Form>) =>
 function AgeStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
   return (
     <div>
-      <StepHeading tag="03 / Age" title={`When was ${form.name || 'your dog'} born?`} body="Approximate is fine — even just a guess at the year." />
+      <StepHeading tag="03 / Age" title={`When was ${form.name || 'your dog'} born?`} body="Approximate is fine - even just a guess at the year." />
       <input
         autoFocus
         type="date"
@@ -407,7 +407,7 @@ function AgeStep({ form, update }: { form: Form; update: (p: Partial<Form>) => v
         max={new Date().toISOString().slice(0, 10)}
         className="w-full bg-white border border-ink/10 rounded-2xl px-5 py-4 text-lg outline-none focus:border-moss"
       />
-      <p className="text-[13px] text-ink-faint mt-3">If unsure, ask your vet — they can estimate from teeth and joints.</p>
+      <p className="text-[13px] text-ink-faint mt-3">If unsure, ask your vet - they can estimate from teeth and joints.</p>
     </div>
   );
 }
@@ -490,7 +490,7 @@ function HealthStep({ form, update }: { form: Form; update: (p: Partial<Form>) =
   };
   return (
     <div>
-      <StepHeading tag="05 / Health" title="Anything we should know?" body="Skip if none apply — you can add later in Health." />
+      <StepHeading tag="05 / Health" title="Anything we should know?" body="Skip if none apply - you can add later in Health." />
       <div className="space-y-7">
         <div>
           <p className="text-sm font-medium text-ink-soft mb-3">Existing conditions</p>
@@ -530,7 +530,7 @@ function HealthTimelineStep({ form, update }: { form: Form; update: (p: Partial<
       <StepHeading
         tag="06 / Timeline"
         title={`When were these last given to ${form.name || 'your dog'}?`}
-        body="Skip any you're not sure about — we'll just remind you to check with your vet. You can update later in the Health tab."
+        body="Skip any you're not sure about - we'll just remind you to check with your vet. You can update later in the Health tab."
       />
       <div className="space-y-2.5">
         {TIMELINE_RECORDS.map((r) => {
@@ -567,7 +567,7 @@ function HealthTimelineStep({ form, update }: { form: Form; update: (p: Partial<
 function LifestyleStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
   return (
     <div>
-      <StepHeading tag="07 / Lifestyle" title="Food and movement." body="Defaults are sensible for most dogs — adjust if you know better." />
+      <StepHeading tag="07 / Lifestyle" title="Food and movement." body="Defaults are sensible for most dogs - adjust if you know better." />
       <div className="space-y-6">
         <div>
           <label className="text-sm font-medium text-ink-soft">Current food (brand or type)</label>
@@ -755,7 +755,7 @@ function PreviewStep({ form }: { form: Form }) {
       icon: '💛',
       title: 'Weekly wellness check (Tuesdays)',
       sub: breed
-        ? `Watch for ${breed.watchFor.split(',')[0].trim()} — common in ${breed.name}s`
+        ? `Watch for ${breed.watchFor.split(',')[0].trim()} - common in ${breed.name}s`
         : 'Quick scan for limping, off food, scratching, mood',
     },
     {
@@ -791,7 +791,7 @@ function PreviewStep({ form }: { form: Form }) {
         ))}
       </div>
       <p className="text-[12px] text-ink-faint mt-5 text-center">
-        Pawly is not a substitute for veterinary advice. Anything urgent — call your vet.
+        Pawly is not a substitute for veterinary advice. Anything urgent - call your vet.
       </p>
     </div>
   );
@@ -818,7 +818,7 @@ function DoneStep({ form, onFinish, submitting, error }: {
         {form.name ? `Welcome, ${form.name}!` : 'All set!'}
       </h1>
       <p className="text-ink-soft mt-4 text-lg max-w-lg mx-auto">
-        We&rsquo;re building today&rsquo;s personalised plan — feeding, walks, training, health reminders. You can change anything later.
+        We&rsquo;re building today&rsquo;s personalised plan - feeding, walks, training, health reminders. You can change anything later.
       </p>
       {error && <p className="text-danger text-sm mt-4">{error}</p>}
       <div className="mt-10">

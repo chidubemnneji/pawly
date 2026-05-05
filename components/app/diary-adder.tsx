@@ -47,7 +47,7 @@ export function DiaryAdder({ dogId }: { dogId: string }) {
       setCaption('');
       startTransition(() => router.refresh());
     } catch {
-      setError('Save failed — try again');
+      setError('Save failed - try again');
     } finally {
       setBusy(false);
     }

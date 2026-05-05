@@ -24,7 +24,7 @@ export function Hero() {
               The calm, caring app that <span className="text-moss">grows with your dog.</span>
             </h1>
             <p className="mt-6 text-lg text-ink-soft max-w-xl leading-relaxed">
-              Personalised feeding, walks, training and health reminders — built around <em>your</em> dog, not just any dog. With breed-aware AI you can ask anything, anytime.
+              Personalised feeding, walks, training and health reminders - built around <em>your</em> dog, not just any dog. With breed-aware AI you can ask anything, anytime.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link href="/onboarding">

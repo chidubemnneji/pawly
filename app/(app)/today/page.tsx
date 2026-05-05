@@ -105,7 +105,7 @@ export default async function TodayPage({
 
   return (
     <div className="px-5 md:px-10 py-6 max-w-3xl mx-auto">
-      {/* Hero — gradient card with dog photo as anchor */}
+      {/* Hero - gradient card with dog photo as anchor */}
       <header className="gradient-hero rounded-[28px] p-6 md:p-8 mb-6 relative overflow-hidden border border-white/40 shadow-soft">
         <div className="flex items-center gap-5 md:gap-7 relative">
           <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl overflow-hidden shadow-lift bg-biscuit-soft flex items-center justify-center font-display text-3xl md:text-4xl font-semibold text-moss-deep shrink-0 ring-4 ring-white/60">

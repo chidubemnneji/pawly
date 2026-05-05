@@ -84,7 +84,7 @@ export function TaskCard({ task }: { task: Task }) {
             : 'glass-strong',
       )}
     >
-      {/* Tap target — full row toggles complete (mark done / reopen) */}
+      {/* Tap target - full row toggles complete (mark done / reopen) */}
       <button
         type="button"
         onClick={() => send(isDone ? { kind: 'REOPEN' } : { kind: 'DONE' })}

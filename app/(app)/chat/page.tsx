@@ -22,7 +22,7 @@ export default async function ChatPage({
       take: 100,
       select: { id: true, role: true, content: true, severity: true, createdAt: true },
     }),
-    // Resolve vision flag server-side — passed to client as a prop
+    // Resolve vision flag server-side - passed to client as a prop
     // When ai-vision-enabled flag is true for this user, camera button appears
     getModelConfig(userId),
   ]);

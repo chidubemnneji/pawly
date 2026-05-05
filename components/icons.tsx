@@ -1,5 +1,5 @@
 /**
- * Pawly icon set — hand-tuned, single-stroke, friendly.
+ * Pawly icon set - hand-tuned, single-stroke, friendly.
  * All icons accept className for sizing/colour via currentColor.
  */
 import * as React from 'react';

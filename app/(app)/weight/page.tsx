@@ -42,18 +42,18 @@ export default async function WeightPage({
       <div className="grid sm:grid-cols-3 gap-3">
         <Stat
           label="Current"
-          value={latest ? `${latest.weight} ${latest.weightUnit.toLowerCase()}` : (dog.weight ? `${dog.weight} kg` : '—')}
+          value={latest ? `${latest.weight} ${latest.weightUnit.toLowerCase()}` : (dog.weight ? `${dog.weight} kg` : '-')}
           sub={latest ? fmtDate(latest.notedAt) : 'Not logged yet'}
         />
         <Stat
           label="Breed range"
-          value={breed ? `${breed.weightKg[0]}–${breed.weightKg[1]} kg` : '—'}
+          value={breed ? `${breed.weightKg[0]}–${breed.weightKg[1]} kg` : '-'}
           sub={inRange === null ? '' : inRange ? 'In range' : 'Outside typical range'}
           tone={inRange === false ? 'warn' : inRange ? 'good' : 'neutral'}
         />
         <Stat
           label="Change"
-          value={logs.length >= 2 ? `${change >= 0 ? '+' : ''}${change.toFixed(1)} kg` : '—'}
+          value={logs.length >= 2 ? `${change >= 0 ? '+' : ''}${change.toFixed(1)} kg` : '-'}
           sub={logs.length >= 2 ? 'Since first log' : 'Need 2+ logs'}
           tone={Math.abs(change) > 1 ? 'warn' : 'neutral'}
         />

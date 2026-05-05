@@ -9,7 +9,7 @@ const hasGoogle = !!(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRE
 const hasResend = !!process.env.AUTH_RESEND_KEY;
 
 export default function LoginPage() {
-  // In demo mode, login isn't needed — just bounce to onboarding/today
+  // In demo mode, login isn't needed - just bounce to onboarding/today
   if (isDemoMode || (!hasGoogle && !hasResend)) {
     redirect('/today');
   }

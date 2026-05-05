@@ -2,7 +2,7 @@
  * POST /api/vision
  *
  * Analyse a photo of a dog. Gated behind the ai-vision-enabled feature flag.
- * The vision model is independently versioned via the ai-vision-model flag —
+ * The vision model is independently versioned via the ai-vision-model flag -
  * so the model can be updated or rolled back without changing the reasoning
  * or triage models.
  *
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     const userId = session.user.id
 
-    // Resolve model config — check if vision is enabled for this user
+    // Resolve model config - check if vision is enabled for this user
     const modelConfig = await getModelConfig(userId, req as any)
 
     if (!modelConfig.visionEnabled) {
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       mediaType,
       dog,
       question,
-      modelConfig.vision,  // flag-controlled model — can roll back instantly
+      modelConfig.vision,  // flag-controlled model - can roll back instantly
     )
 
     return NextResponse.json({

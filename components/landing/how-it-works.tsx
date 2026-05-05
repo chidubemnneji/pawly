@@ -2,12 +2,12 @@ const STEPS = [
   {
     n: 1,
     title: 'Tell us about your dog',
-    body: '8 quick steps — name, breed, age, weight, lifestyle. Two minutes, and we have what we need.',
+    body: '8 quick steps - name, breed, age, weight, lifestyle. Two minutes, and we have what we need.',
   },
   {
     n: 2,
     title: 'Get a personalised plan',
-    body: 'Daily feeding, walks, training and health reminders — all calibrated for your dog specifically.',
+    body: 'Daily feeding, walks, training and health reminders - all calibrated for your dog specifically.',
   },
   {
     n: 3,

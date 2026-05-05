@@ -18,21 +18,21 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://pawly.app'),
   title: {
-    default: 'Pawly — Your AI dog care companion',
+    default: 'Pawly - Your AI dog care companion',
     template: '%s · Pawly',
   },
   description:
-    "The calm, caring, breed-aware app that helps you raise a happier, healthier dog. Personalised feeding, walks, training and health reminders — built around your dog.",
+    "The calm, caring, breed-aware app that helps you raise a happier, healthier dog. Personalised feeding, walks, training and health reminders - built around your dog.",
   keywords: ['dog care', 'puppy app', 'dog health tracker', 'dog feeding calculator', 'dog training', 'AI dog assistant'],
   openGraph: {
-    title: 'Pawly — Your AI dog care companion',
+    title: 'Pawly - Your AI dog care companion',
     description: 'Personalised, breed-aware dog care for the modern owner.',
     type: 'website',
     siteName: 'Pawly',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pawly — Your AI dog care companion',
+    title: 'Pawly - Your AI dog care companion',
     description: 'Personalised, breed-aware dog care for the modern owner.',
   },
   manifest: '/manifest.webmanifest',

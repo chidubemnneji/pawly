@@ -5,7 +5,7 @@ import { LandingNav } from '@/components/landing/nav';
 import { Footer } from '@/components/landing/footer';
 
 export const metadata: Metadata = {
-  title: 'All breeds — Pawly',
+  title: 'All breeds - Pawly',
   description: `Breed-aware care for ${BREEDS.length}+ dog breeds. Find weight ranges, exercise needs, common traits and what to watch for.`,
 };
 
@@ -21,7 +21,7 @@ export default function BreedsIndexPage() {
           Care notes for {BREEDS.length}+ breeds.
         </h1>
         <p className="text-ink-soft mt-4 text-lg max-w-2xl">
-          Find your dog&rsquo;s typical weight, exercise needs, behaviour and health watch-points — and start a personalised plan.
+          Find your dog&rsquo;s typical weight, exercise needs, behaviour and health watch-points - and start a personalised plan.
         </p>
 
         <div className="mt-12 space-y-10">
