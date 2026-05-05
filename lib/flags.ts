@@ -150,7 +150,8 @@ export async function isEnabled(
   req?: NextRequest
 ): Promise<boolean> {
   const flags = await getFlags(userId, req)
-  return flags[key]
+  const val = flags[key]
+  return typeof val === 'string' ? val !== '' && val !== 'false' : Boolean(val)
 }
 
 // Country lists by region
