@@ -222,7 +222,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
 function NameStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
   return (
     <div>
-      <StepHeading tag="01 / Name" title="What&rsquo;s your dog&rsquo;s name?" body="Add a photo too - it personalises the whole app." />
+      <StepHeading tag="01 / Name" title="What&rsquo;s your dog&rsquo;s name?" body="Add a photo too, it personalises the whole app." />
       <div className="flex items-center gap-5 mt-4">
         <PhotoPicker
           value={form.photoDataUrl}
