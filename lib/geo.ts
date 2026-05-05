@@ -77,7 +77,7 @@ async function resolveCountryFromIp(ip: string): Promise<CountryCode> {
  * Extract client IP from Railway's x-forwarded-for header.
  * Railway sets this automatically — the first IP in the chain is the client.
  */
-export function getClientIp(req?: NextRequest): string {
+export async function getClientIp(req?: NextRequest): Promise<string> {
   try {
     // In route handlers we have the request object
     if (req) {
@@ -86,7 +86,7 @@ export function getClientIp(req?: NextRequest): string {
       return req.headers.get('x-real-ip') || '127.0.0.1'
     }
     // In server components we use next/headers
-    const headersList = headers()
+    const headersList = await headers()
     const forwarded = headersList.get('x-forwarded-for')
     if (forwarded) return forwarded.split(',')[0].trim()
     return headersList.get('x-real-ip') || '127.0.0.1'
@@ -104,7 +104,7 @@ export async function getGeoContext(req?: NextRequest): Promise<{
   country: CountryCode
   region: GeoRegion
 }> {
-  const ip = getClientIp(req)
+  const ip = await getClientIp(req)
   const country = await resolveCountryFromIp(ip)
   const region = getRegion(country)
   return { ip, country, region }
