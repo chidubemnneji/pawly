@@ -115,11 +115,8 @@ export async function getFlags(
         continue
       }
 
-      // String-valued flags (model IDs) — return the string when flag is enabled
-      if (flag.stringValue && flag.enabled) {
-        result[flag.key as FlagKey] = flag.stringValue
-        continue
-      }
+      // String-valued flags (model IDs) — for now model IDs come from MODEL_DEFAULTS
+      // stringValue column can be added to schema in a future migration
 
       // Geo gate — must pass before rollout is evaluated
       if (!passesGeoGate(flag.countries, geo.country)) {
@@ -199,9 +196,9 @@ export async function seedFlags() {
     // AI model governance flags — stringValue stores the model ID
     // To upgrade a model: update stringValue in the DB or via /api/flags
     // To roll back: set enabled: false → falls back to MODEL_DEFAULTS in aiModels.ts
-    { key: 'ai-reasoning-model',    description: 'Reasoning model ID for chat responses',         enabled: true,  rolloutPct: 100, countries: [], stringValue: 'claude-sonnet-4-6' },
-    { key: 'ai-triage-model',       description: 'Triage classifier model ID',                    enabled: true,  rolloutPct: 100, countries: [], stringValue: 'claude-haiku-4-5-20251001' },
-    { key: 'ai-vision-model',       description: 'Vision model ID for photo analysis',            enabled: true,  rolloutPct: 100, countries: [], stringValue: 'claude-sonnet-4-6' },
+    { key: 'ai-reasoning-model',    description: 'Reasoning model ID for chat responses',         enabled: true,  rolloutPct: 100, countries: [] },
+    { key: 'ai-triage-model',       description: 'Triage classifier model ID',                    enabled: true,  rolloutPct: 100, countries: [] },
+    { key: 'ai-vision-model',       description: 'Vision model ID for photo analysis',            enabled: true,  rolloutPct: 100, countries: [] },
     { key: 'ai-vision-enabled',     description: 'Enable photo analysis feature',                 enabled: true,  rolloutPct: 100, countries: [] },
   ]
 
